@@ -1,0 +1,284 @@
+MLXGROUP(Simple)
+	MLXCHAR(' ', Space)
+	MLXCHAR(  9, Tab)
+	MLXCHAR( 10, Lf)
+	MLXCHAR( 13, Cr)
+	MLXCHAR(':', Colon)
+	MLXCHAR(';', Semicolon)
+	MLXCHAR('.', Dot)
+	MLXCHAR(',', Comma)
+	MLXCHAR('@', At)
+	MLXCHAR('+', Plus)
+	MLXCHAR('-', Minus)
+	MLXCHAR('|', Bar)
+	MLXCHAR('"', Quote)
+	MLXCHAR('(', LPar)
+	MLXCHAR(')', RPar)
+	MLXCHAR('[', LSqr)
+	MLXCHAR(']', RSqr)
+	MLXCHAR('_', Under)
+	MLXRANGE('0', '9', Num)
+	MLXRANGE('A', 'Z', AlphaCapital)
+	MLXRANGE('a', 'z', AlphaSmall)
+END_MLXGROUP
+
+MLXSEQUENCE(Nl)
+	IS(Cr, Optional)
+	IS(Lf, Optional)
+END_MLXSEQUENCE
+
+MLXGROUP(Alpha)
+	IS(AlphaCapital, Once)
+	IS(AlphaSmall, Once)
+	IS(Under, Once)
+END_MLXGROUP
+
+
+MLXGROUP(WhiteSpace)
+	IS(Space, Optional)
+	IS(Tab, Optional)
+	IS(Nl, Optional)
+END_MLXGROUP
+
+MLXSEQUENCE(String)
+	IS(Quote, Once)
+	IS(Quote, WhileNot)
+	IS(Quote, Once)
+END_MLXSEQUENCE
+
+MLXGROUP(Sign)
+	IS(Plus, Optional)
+	IS(Minus, Optional)
+END_MLXGROUP
+
+MLXSEQUENCE(Number1)
+	IS(Num, Multiple)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(NumberFraction)
+	IS(Dot, Once)
+	IS(Num, Multiple)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(Number2)
+	IS(Number1, Multiple)
+	IS(NumberFraction, MayMore)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(Number3)
+	//IS(Sign, Optional)
+	IS(Number1, Multiple)
+	IS(NumberFraction, MayMore)
+	KEYWORD("E")
+	IS(Sign, Optional)
+	IS(Number1, Multiple)
+END_MLXSEQUENCE
+
+MLXGROUP(Number)
+	IS(Number1, Once)
+	IS(Number2, Once)
+	IS(Number3, Once)
+END_MLXGROUP
+
+MLXGROUP(Ident2)
+	IS(Alpha, Optional)
+	IS(Num, Optional)
+	IS(Under, Optional)
+END_MLXGROUP
+
+MLXSEQUENCE(Ident)
+	IS(Alpha, Once)
+	IS(Ident2, MayMore)
+END_MLXSEQUENCE
+
+MLXGROUP(IdentList2)
+	IS(Comma, Once)
+	IS(IdentList, Once)
+END_MLXGROUP
+
+MLXSEQUENCE(IdentList)
+	IS(Ident, Once)
+	IS(IdentList2, Multiple)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(LineVersion)
+	KEYWORD("VERSION")
+	IS(Space, MayMore)
+	IS(String, Once)
+	IS(Nl, Multiple)
+END_MLXSEQUENCE
+
+MLXGROUP(TagMux)
+	KEYWORD("M")
+	IS(Space, Once)
+END_MLXGROUP
+
+MLXSEQUENCE(TagMuxIndex)
+	KEYWORD("m")
+	IS(Number, Once)
+	IS(Space, Once)
+END_MLXSEQUENCE
+
+MLXGROUP(Mux)
+	IS(Space, Once)
+	IS(TagMux, Once)
+	IS(TagMuxIndex, Once)
+END_MLXGROUP
+
+MLXSEQUENCE(LineSg)
+	IS(Space, Once)
+	KEYWORD("SG_")
+	IS(Space, Once)
+	IS(Ident, Once)
+	IS(Mux, Once)
+	IS(Colon, Once)
+
+	IS(Space, Once)
+	IS(Number, Once)
+	IS(Bar, Once)
+	IS(Number, Once)
+	IS(At, Once)
+	IS(Number, Once)
+	IS(Sign, Once)
+	IS(Space, Once)
+
+	IS(LPar, Once)
+	IS(Number, Once)
+	IS(Comma, Once)
+	IS(Number, Once)
+	IS(RPar, Once)
+	IS(Space, Once)
+
+	IS(LSqr, Once)
+	IS(Number, Once)
+	IS(Bar, Once)
+	IS(Number, Once)
+	IS(RSqr, Once)
+	IS(Space, Once)
+	
+	IS(String, Once)
+	IS(Space, Once)
+	IS(IdentList, Once)
+	IS(Nl, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(LineBo)
+	KEYWORD("BO_")
+	IS(Space, Once)
+	IS(Number, Once)
+	IS(Space, Once)
+	IS(Ident, Once)
+	IS(Colon, Once)
+	IS(Space, Once)
+	IS(Number, Once)
+	IS(Space, Once)
+	IS(Ident, Once)
+	IS(Nl, Once)
+	IS(LineSg, Multiple)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(RefBu)
+	KEYWORD("BU_")
+	IS(Space, Once)
+	IS(Ident, Once)
+	IS(Space, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(RefBo)
+	KEYWORD("BO_")
+	IS(Space, Once)
+	IS(Number, Once)
+	IS(Space, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(RefSg)
+	KEYWORD("SG_")
+	IS(Space, Once)
+	IS(Number, Once)
+	IS(Space, Once)
+	IS(Ident, Once)
+	IS(Space, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(RefRoot)
+	IS(Space, Once)
+	IS(Ident, Once)
+	IS(Space, Once)
+END_MLXSEQUENCE
+
+MLXGROUP(Ref)
+	IS(RefRoot, Once)
+	IS(RefBu, Once)
+	IS(RefBo, Once)
+	IS(RefSg, Once)
+END_MLXGROUP
+
+MLXSEQUENCE(LineCm)
+	KEYWORD("CM_")
+	IS(Space, Once)
+	IS(Ref, Once)
+	IS(String, Once)
+	IS(Semicolon, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(LineBa)
+	KEYWORD("BA_")
+	IS(Space, Once)
+	IS(String, Once)
+	IS(Space, Once)
+	IS(Ref, Once)
+	IS(Space, Once)
+	IS(Number, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(OneListItem)
+	IS(Tab, MayMore)
+	IS(Ident, Once)
+	IS(Nl, Once)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(OneListItem2)
+	IS(Space, MayMore)
+	IS(Ident, Once)
+END_MLXSEQUENCE
+
+MLXGROUP(OneListItem3)
+	IS(OneListItem2, MayMore)
+	IS(Nl, Once)
+END_MLXGROUP
+
+MLXSEQUENCE(LineNs)
+	KEYWORD("NS_")
+	IS(Space, MayMore)
+	IS(Colon, Once)
+	IS(Space, MayMore)
+	IS(Nl, Optional)
+	IS(OneListItem, Multiple)
+	IS(Nl, Multiple)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(LineBs)
+	KEYWORD("BS_")
+	IS(Colon, Once)
+	IS(OneListItem3, MayMore)
+END_MLXSEQUENCE
+
+MLXSEQUENCE(LineBu)
+	KEYWORD("BU_")
+	IS(Colon, Once)
+	IS(OneListItem3, MayMore)
+END_MLXSEQUENCE
+
+MLXGROUP(CLine)
+	IS(LineBs, Once)
+	IS(LineBu, Once)
+	IS(LineBo, Once)
+	IS(LineCm, Once)
+	IS(Nl, Once)
+END_MLXGROUP
+
+MLXSEQUENCE(All)
+	IS(LineVersion, Once)
+	IS(LineNs, Once)
+	IS(CLine, Multiple)
+END_MLXSEQUENCE

@@ -1,0 +1,7 @@
+LAYOUT(midbcLayout, 540, 320)
+	ITEM(MenuBar, menu, HSizePosZ(0, 0).TopPosZ(0, 20))
+	ITEM(SqlArray, sa_main, LeftPosZ(248, 292).TopPosZ(60, 172))
+	ITEM(EditString, filter, LeftPosZ(284, 112).TopPosZ(20, 19))
+	ITEM(TreeCtrl, tree, LeftPosZ(12, 112).TopPosZ(48, 188))
+END_LAYOUT
+

@@ -1,0 +1,22 @@
+description "mi can dbc\377";
+
+uses
+	CtrlLib,
+	plugin/sqlite3;
+
+file
+	midbc.sch,
+	midbc.h,
+	main.cpp,
+	midbc.lay,
+	midbc.iml,
+	dbclex.h,
+	dbclex.cpp,
+	milex.h,
+	milex_header.h,
+	milex_code.h,
+	dbclex.mlx;
+
+mainconfig
+	"" = "GUI";
+
