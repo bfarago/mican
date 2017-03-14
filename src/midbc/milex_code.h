@@ -50,6 +50,11 @@ bool MiTokens::NotIn(Token_en t){
 	return 0==((1<<t) & set);
 }
 //------------------------------------------------------------
+MiContext::MiContext(bool x)
+:token(T_UNKNOWN), ex(x)
+{
+}
+//------------------------------------------------------------
 MiLex::MiLex(){
 	Init();
 	stop=0;
@@ -98,7 +103,7 @@ void MiLex::End(){
 		sp=0;
 	}
 }
-bool MiLex::Is(const Token_en rule, fn_rule fn, Token_en& token, bool ex, const Hit_en hit){
+bool MiLex::Is(const Token_en rule, fn_rule fn, MiContext* context, const Hit_en hit){
 	int accept=0;
 	bool repeat=false;
 	bool negate=false;
@@ -157,19 +162,20 @@ bool MiLex::Is(const Token_en rule, fn_rule fn, Token_en& token, bool ex, const 
 		if (T_Nl==ret){
 			line++; column=1;
 		}
-		token= rule;
+		context->token= rule;
 		wasok=true;
 		mandatory=false;
 	}else{
 		Undo();
-		if (mandatory){
+		if (mandatory &!context->ex){
 			err("Mandatory token missing", rule, ret, hit);
 		}
 	}
 	if (ok && repeat) goto again;
 	if (wasok |!mandatory) {
-		token=rule;
-		info("a", rule, ret, hit);
+		context->token=rule;
+		
+		info(mandatory?"a":"o", rule, ret, hit);
 		stop=0;
 	}else{
 		info("u", rule, ret, hit);
@@ -259,14 +265,14 @@ Token_en MiLex::IsChar(Token_en rule){
 #	undef KEYWORD
 
 // rule function body for other rules GRUP and SEQUENCE
-#	define MLXGROUP(name) Token_en MiLex::rule_ ## name() { Token_en token=T_UNKNOWN; bool ex=true; Token_en ret=T_ ## name;
-#	define END_MLXGROUP return token; }
-#	define MLXSEQUENCE(name)  Token_en MiLex::rule_ ## name() { Token_en token=T_UNKNOWN; bool ex=false; Token_en ret=T_ ## name;
+#	define MLXGROUP(name) Token_en MiLex::rule_ ## name() { MiContext context(true); Token_en ret=T_ ## name;
+#	define END_MLXGROUP return context.token; }
+#	define MLXSEQUENCE(name)  Token_en MiLex::rule_ ## name() { MiContext context(false); Token_en ret=T_ ## name;
 #	define END_MLXSEQUENCE return ret; }
-#	define IS(name, hit) if (Is(T_ ## name, &MiLex::rule_ ## name, token, ex, H_ ## hit)) { if (ex) return ret; }else if (!ex) return T_UNKNOWN;
+#	define IS(name, hit) if (Is(T_ ## name, &MiLex::rule_ ## name, &context, H_ ## hit)) { if (context.ex) return ret; }else if (!context.ex) return T_UNKNOWN;
 #	define MLXCHAR(ch, name)
 #	define MLXRANGE(from, to, name)
-#	define KEYWORD(str) if(IsString(str)){ infoKeyword("a",T_KEYWORD,str); Accept(strlen(str)); token=T_KEYWORD; if (ex) return ret; } else if (!ex) return T_UNKNOWN;
+#	define KEYWORD(str) if(IsString(str)){ infoKeyword("a",T_KEYWORD,str); Accept(strlen(str)); context.token=T_KEYWORD; if (context.ex) return ret; } else if (!context.ex) return T_UNKNOWN;
 #	include LEXFILE
 #	undef MLXGROUP
 #	undef END_MLXGROUP

@@ -51,7 +51,12 @@ class MiTokens{
 
 #define MAX_STACK 32
 
-
+class MiContext {
+	public:
+	MiContext(bool x);
+	Token_en token;
+	bool ex;
+};
 
 class MiLex {
 public:
@@ -85,7 +90,7 @@ protected:
  Token_en Token();
  Token_en IsChar(Token_en rule);
  bool IsString(const char* str);
- bool Is(const Token_en rule, fn_rule fn, Token_en& token, bool ex, const Hit_en hit);
+ bool Is(const Token_en rule, fn_rule fn, MiContext* context, const Hit_en hit);
 #	define MLXGROUP(name) Token_en rule_ ## name();
 #	define END_MLXGROUP
 #	define MLXSEQUENCE(name)  Token_en rule_ ## name();
